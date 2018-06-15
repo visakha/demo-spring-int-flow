@@ -5,18 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessagingTemplate;
-import org.springframework.integration.endpoint.EventDrivenConsumer;
-import org.springframework.integration.mapping.OutboundMessageMapper;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
-import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.env.sample.demospringint.svc.EchoService;
 
 /**
  * @author Vamsi Vegi
@@ -24,56 +17,70 @@ import com.env.sample.demospringint.svc.EchoService;
  */
 
 @RestController
+@RequestMapping("/spring-int-demo")
 public class EndPoints {
 
 
   @Autowired
   @Qualifier("requestChannelOneHello")
-  DirectChannel requestChannelHello;
+  DirectChannel requestChannelOneHello;
 
   /**
-   * http://localhost:8080/hello
-   * you will see: hello TEST
+   * Demo: Use MessageTemplate and the method sendAndReceive
+   * to get the reply back
+   * case 1:
+   * http://localhost:8080/spring-int-demo/case1
+   *
    * @return
+   * hello from case 1: Reply is MSG FROM CASE 1
    */
-  @GetMapping("/hello")
-  public String hello(){
-	  MessagingTemplate template = new MessagingTemplate();
+  @GetMapping("/case1")
+  public String useCaseOnehello() {
+    MessagingTemplate template = new MessagingTemplate();
 
-	  Message reply = template.sendAndReceive(requestChannelHello, new GenericMessage("test"));
-      return "hello " +  (String) reply.getPayload();
+    Message reply = template.sendAndReceive(requestChannelOneHello, new GenericMessage("Msg from case 1"));
+    return "hello from case 1: Reply is " + (String) reply.getPayload();
   }
 
 
+  /**
+   * Demo: Use Gatewat and make sure the flow does not instantiate its own channel
+   * that way we get the reply back
+   * case 2:
+   * http://localhost:8080/spring-int-demo/case2
+   *
+   * @return
+   * hello from case 2: Reply is MSG FROM CASE 2-GTWY-
+   */
 
   @Autowired
   MyConfig.GtwyReqReply gtwyReqReply;
 
-  /**
-   * http://localhost:8080/helloGtwy
-   * you will see: hello USING -GTWY-
-   * @return
-   */
-  @GetMapping("/helloGtwy")
-  public String hello2(){
+  @GetMapping("/case2")
+  public String case2() {
 
-    return "hello " +  gtwyReqReply.sendRecv("Using ");
+    return "hello from case 2: Reply is " + gtwyReqReply.sendRecv("Msg from case 2");
   }
 
+
+  /**
+   * Demo: same as cas2, but the flow also has a SubFlow or a handoff flow
+   * and we still get the reply back
+   * case 3:
+   * http://localhost:8080/spring-int-demo/case3
+   *
+   * @return
+   * hello from case 2: Reply is MSG FROM CASE 3-GTWY enahnced here @ Main Flow- enahnced here @ Sub Flow
+   */
 
   @Autowired
   MyConfig.GtwyReqReplyWithSubFlow gtwyReqReplyWithSubFlow;
-  /**
-   * http://localhost:8080/helloGtwySf
-   * you will see: hello USING WITHSF -GTWY enahnced here @ Main Flow- enahnced here @ Sub Flow
-   * @return
-   */
-  @GetMapping("/helloGtwySf")
-  public String hello3(){
 
-    return "hello " +  gtwyReqReplyWithSubFlow.sendRecv("Using withSF ");
+  @GetMapping("/case3")
+  public String case3() {
+
+    return "hello from case 2: Reply is " + gtwyReqReplyWithSubFlow.sendRecv("Msg from case 3");
   }
-
 
 
 }
