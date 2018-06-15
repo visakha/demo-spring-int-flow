@@ -28,6 +28,7 @@ public class EndPoints {
 
 
   @Autowired
+  @Qualifier("requestChannelOneHello")
   DirectChannel requestChannelHello;
 
   /**
@@ -58,6 +59,21 @@ public class EndPoints {
 
     return "hello " +  gtwyReqReply.sendRecv("Using ");
   }
+
+
+  @Autowired
+  MyConfig.GtwyReqReplyWithSubFlow gtwyReqReplyWithSubFlow;
+  /**
+   * http://localhost:8080/helloGtwySf
+   * you will see: hello USING WITHSF -GTWY enahnced here @ Main Flow- enahnced here @ Sub Flow
+   * @return
+   */
+  @GetMapping("/helloGtwySf")
+  public String hello3(){
+
+    return "hello " +  gtwyReqReplyWithSubFlow.sendRecv("Using withSF ");
+  }
+
 
 
 }
