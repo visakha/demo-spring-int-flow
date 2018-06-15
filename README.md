@@ -1,5 +1,6 @@
 # Spring Boot Integration Sample
-Using the Rest Controller and usig Spring Int as a callable library rather than framework
+Using the Rest Controller to innteract with outside world
+and Spring Integration as a callable library to allow message oriented paradigm
 
 RestController -> Send Msg -> Spring Int flow -> get response -> show response to Browser
 
